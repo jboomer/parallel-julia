@@ -1,12 +1,21 @@
 #Needed for plotting
 using PyPlot
 
-#Mandelbrot function
-@everywhere include("mandel.jl")
-
 #Height and width points
 @everywhere w = 5000
 @everywhere h = 5000
+
+#Mandelbrot function
+@everywhere function mandel(z, maxIter::Int64)
+	c = z
+	for n = 1:maxIter
+		if abs(z) > 2
+			return n - 1
+		end
+		z = z^2 + c
+	end
+	return maxIter
+end
 
 #Initialization function for distributed Array
 @everywhere function initDArray(localdims)
@@ -32,6 +41,7 @@ using PyPlot
 end
 
 #Initialize the array and convert to local array
+println("Starting initialization of DArray")
 tic()
 	#Split on rows, default is columns 
 Dm = DArray(initDArray, (h,w), workers(), [size(workers(),1), 1])
