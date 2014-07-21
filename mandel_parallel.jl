@@ -7,7 +7,8 @@ using PyPlot
 
 #Mandelbrot function
 @everywhere function mandel(z, maxIter::Int64)
-	c = z
+	# c = z # For Mandelbrot set
+	c = complex(-0.8,0.156) # For Julia set
 	for n = 1:maxIter
 		if abs(z) > 2
 			return n - 1
@@ -40,13 +41,14 @@ end
 	return m
 end
 
-#Initialize the array and convert to local array
+#Initialize the array and convert to local array, timing the operation
 println("Starting initialization of DArray")
-tic()
-	#Split on rows, default is columns 
-Dm = DArray(initDArray, (h,w), workers(), [size(workers(),1), 1])
-m = convert(Array, Dm)
-toc()
+@time m = begin
+		#Split on rows, default is columns 
+		Dm = DArray(initDArray, (h,w), workers(), [size(workers(),1), 1])
+		convert(Array, Dm)
+	end
+
 
 #Make a pretty picture
 imshow(m)
