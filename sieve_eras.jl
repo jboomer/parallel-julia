@@ -12,7 +12,7 @@ function sieve_E(N)
 	end
 end
 
-#Create the Task object
+#Create the Task object for primes up to 20 million
 sieve = Task(() -> sieve_E(20000000))
 
 primesum = 0
