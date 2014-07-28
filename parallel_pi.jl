@@ -1,4 +1,4 @@
-nPoints = 5e7
+nPoints = 50000000 
 
 @time cPoints = @parallel (+) for i=1:nPoints
 	x,y = rand(2)
