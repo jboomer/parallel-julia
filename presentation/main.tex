@@ -4,6 +4,7 @@
 \documentclass{beamer}
 \usetheme{Warsaw}
 \usepackage{url}
+\usepackage{xcolor}
 
 \AtBeginSection[]
 {
@@ -21,9 +22,16 @@
 \begin{document}
 	\frame{\titlepage}
 	\section{Introduction}
+	\begin{frame}{Background(1)}
+		\begin{quote}
+			" We want a language that’s open source, with a liberal license. We want the speed of C with the dynamism of Ruby. We want a language that’s homoiconic, with true macros like Lisp, but with obvious, familiar mathematical notation like Matlab. We want something as usable for general programming as Python, as easy for statistics as R, as natural for string processing as Perl, as powerful for linear algebra as Matlab, as good at gluing programs together as the shell. Something that is dirt simple to learn, yet keeps the most serious hackers happy. We want it interactive and we want it compiled."
+		\end{quote}
+		 Julia developers on "Why we created Julia"
+	\end{frame}
 
-	\begin{frame}{General}
-		\begin{block}{Julia is:} 
+
+	\begin{frame}{Background(2)}
+		Julia is: 
 		\begin{itemize}
 			\item{Free \& Open source (MIT licensed)}
 			\item{Development started in 2009, v0.1 in 2012}
@@ -33,17 +41,16 @@
 			\item{JIT Compiled}
 			\item{Optimized for speed of calculation}
 		\end{itemize}
-		\end{block}
 	\end{frame}
 	
 	\begin{frame}{Benchmarks}
 		\includegraphics[width=\textwidth]{figures/benchmarks.jpg}
 	\end{frame}
 
-	\begin{frame}[fragile]{Some features(1)}
+	\begin{frame}[fragile]{Some syntax}
 		\begin{block}{Examples}
 			\begin{semiverbatim}
-			julia> [i*2 for i=1:5]
+			julia> [i*2 for i=1:5]   
 			[1 4 6 8 10]
 			
 			julia> function printargs(args...)
@@ -51,10 +58,9 @@
 		 	           println(a)
 			         end
 			       end
-			printargs (generic function with 1 method)
 
 			julia> map(x->(x\%3==0), [3 4 12])
-			[true, false, true]
+			[true, false, true]        
 			\end{semiverbatim}
 		\end{block}
 	\end{frame}
@@ -71,7 +77,7 @@
 			  return val
 			end
 
-			julia> @time rand(100,00)
+			julia> @time rand(100,100)
 			elapsed time 0.00679384 seconds
 			100x100 Array\{Float64\}
 			\end{semiverbatim}
@@ -80,32 +86,51 @@
 
 	\section{Tasks}
 
-	\begin{frame}{Tasks vs Functions}
+	\begin{frame}{Tasks(1)}
 		\begin{columns}[c]
 			\column{0.5\textwidth}
 				\textbf{Functions (Sub-routines)} \\
 				Call / Return
+				\includegraphics[width = .6\textwidth]{figures/functions.eps}
 			\column{0.5\textwidth}
 				\textbf{Tasks (Co-routines)} \\
-				Yielding to other tasks (saving state)
+				Yielding to other tasks (saving state) \\
+				\includegraphics[width = .6\textwidth]{figures/tasks.eps}
 		\end{columns}
 	\end{frame}
 
-	\begin{frame}{Example: Sieve of Erasthothenes}
-		Sieve
-	\end{frame}
+	\begin{frame}{Tasks(2)}
+		Example: Consumer/producer 
+		\includegraphics[width=.6\textwidth]{figures/consume_produce.eps}
+	\end{frame}	
 
-	\section{Low-level parallelism in Julia}
-	%TODO: Stukje over feeder task (zie parallel computing in docs)
+%	\begin{frame}{Example: Sieve of Erastothenes}
+%		\begin{enumerate}
+%			\item{Start at 2}
+%			\item{If the number is already marked, move to next number}
+%			\item{Else the number is prime, mark all multiples (up to N)}
+%		\end{enumerate}
+%		2 is prime:
+%		\begin{equation*}
+%			2, 3, \textcolor{red}{4}, 5, \textcolor{red}{6}, 7, \textcolor{red}{8}, 9, \textcolor{red}{10}, 11, \textcolor{red}{12}, 13, \textcolor{red}{14}, 15, \textcolor{red}{16}, 17, \textcolor{red}{18}, 19, \textcolor{red}{20}
+%		\end{equation*}
+%		3 is prime:
+%		\begin{equation*}
+%			2, 3, \textcolor{red}{4}, 5, \textcolor{red}{6}, 7, \textcolor{red}{8}, \textcolor{blue}{9}, \textcolor{red}{10}, 11, \textcolor{red}{12}, 13, \textcolor{red}{14}, \textcolor{blue}{15}, \textcolor{red}{16}, 17, \textcolor{red}{18}, 19, \textcolor{red}{20}
+%		\end{equation*}
+%		And so on...
+%
+%	\end{frame}
 
-	\begin{frame}{General}
+	\section{Low level parallel Julia}
+
+	\begin{frame}{Parallel implementation in Julia}
 		\begin{itemize}
 			\item{No native threads (yet?)}
-			\item{No need for mutex locks etc.}	
-			\item{Uses message passing interface to run on different processors}
+			\item{Uses tasks/coroutines for scheduling}
+			\item{Message passing interface for data communication}
 			\item{Implementation of message passing is one-sided}
 		\end{itemize}
-
 	\end{frame}
 	
 	\begin{frame}[fragile]{Worker processes}
@@ -117,7 +142,7 @@
 			\item{Launches \verb+N+ worker processes}
 			\item{Runs \verb+filename+ or interactive session}
 			\item{Workers are numbered $2:N+1$}
-			\item{Can run on multiple cores or cluster of computers}
+			\item{Can run on multiple cores or cluster of computers (specified using a machinefile)}
 		\end{itemize}
 	\end{frame}
 
@@ -140,17 +165,38 @@
 		\end{block}
 	\end{frame}
 
-	\begin{frame}[fragile]{Parallel for loops(1)}
-		\begin{block}{Reduction function}	
+	\section{MapReduce}
+	\begin{frame}[fragile]{MapReduce(1)}
 		\begin{semiverbatim}
-		rand\_number = @parallel (+) for i=1:10000000
-		  rand()
-		end
+			pmap(function, collection)
 		\end{semiverbatim}
+		Performs \verb+function+ on \verb+collection+. Uses a 'feeder' task for each worker process to serve data, while waiting for result the task yields to next feeder task until work is complete. 
+		\begin{block}{Example: list of expressions}
+			\begin{semiverbatim}
+				julia> pmap(eval, \{:(4+4), :(4*4), :(7-2), :(6/2)\} )
+				[8, 16, 5, 3]
+			\end{semiverbatim}
 		\end{block}
 	\end{frame}
 
-	\begin{frame}{Parallel for loops(2)}
+	\begin{frame}[fragile]{MapReduce(2)}
+		\begin{columns}
+		\column{.7\textwidth}
+		\verb+@parallel+ : Macro for MapReduce
+		\begin{block}{Example: coin toss}	
+		\begin{semiverbatim}
+		heads = 
+		@parallel (+) for i=1:10000000
+		  randbool()
+		end
+		\end{semiverbatim}
+		\end{block}
+		\column{.3\textwidth}
+		\includegraphics[width = \textwidth]{figures/parallel_map.eps}
+		\end{columns}
+	\end{frame}
+
+	\begin{frame}{MapReduce(3)}
 		Example: \\
 		parallel computation of $\pi$
 		\begin{columns}[c]
@@ -169,13 +215,8 @@
 	\end{frame}
 
 	\section{Distributed arrays}
-    %Hier iets met een plaatje?
-	\begin{frame}[fragile]{Distributed Arrays}
-		\begin{block}{Constructor}
-		\begin{semiverbatim}
-		DArray(init, dims[, procs, dist])
-		\end{semiverbatim}
-		\end{block}
+	\begin{frame}[fragile]{Syntax}
+    Constructor: \verb+DArray(init, dims[, procs, dist])+
 		\begin{block}{Example with 8 workers:}
 		\begin{semiverbatim}
 		julia> d = DArray(I->rand(length(I[1]),length(I[2])),
@@ -213,7 +254,9 @@
 	\begin{frame}{Links}
 		\begin{itemize}
 			\item{\url{http://julialang.org/}}
+			\item{\url{http://learnxinyminutes.com/docs/julia/}}
 			\item{\url{https://github.com/jboomer/parallel-julia/}}
+			\item{\url{http://www.dabeaz.com/coroutines/}}
 		\end{itemize}
 	\end{frame}
 	

@@ -1,3 +1,6 @@
+## parallel_mandel.jl
+# Plots the mandelbrot set by using a distributed array
+
 #Needed for plotting
 import PyPlot
 
@@ -23,12 +26,12 @@ end
 	println("x range: ", localdims[2], ", y range: ", localdims[1])
 
 	xrange = length(localdims[2])
-	xstart = (localdims[2][1] - w/2) / (w/3)
-	xstop  = (localdims[2][end] - w/2) / (w/3)
+	xstart = (3 * localdims[2][1]) / w  - 2
+	xstop = (3 * localdims[2][end]) / w  - 2 
 
-	ystart = (localdims[1][1] - h/2) / (h/3)
-	ystop  = (localdims[1][end] - h/2) / (h/3)
 	yrange = length(localdims[1])
+	ystart = (3 * localdims[1][1])/ h - 1.5
+	ystop  = (3 * localdims[1][end]) / h - 1.5
 
 	m = Array(Int, (yrange, xrange))
 
@@ -38,6 +41,7 @@ end
 		z = complex(x[2], y[2])
 		m[y[1], x[1]] = mandel(z, 200)
 	end
+  println("Done!")
 	return m
 end
 
