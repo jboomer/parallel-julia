@@ -1,3 +1,6 @@
+## parallel_pi.jl
+# Uses MapReduce pattern to approximate pi.
+
 #Total number of points
 nPoints = 50000000 
 

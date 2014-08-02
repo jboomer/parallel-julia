@@ -1,5 +1,3 @@
-%TODO: Meer figuurtjes? 
-
 %% Preamble
 \documentclass{beamer}
 \usetheme{Warsaw}
@@ -26,7 +24,7 @@
 		\begin{quote}
 			" We want a language that’s open source, with a liberal license. We want the speed of C with the dynamism of Ruby. We want a language that’s homoiconic, with true macros like Lisp, but with obvious, familiar mathematical notation like Matlab. We want something as usable for general programming as Python, as easy for statistics as R, as natural for string processing as Perl, as powerful for linear algebra as Matlab, as good at gluing programs together as the shell. Something that is dirt simple to learn, yet keeps the most serious hackers happy. We want it interactive and we want it compiled."
 		\end{quote}
-		 Julia developers on "Why we created Julia"
+		Julia developers on "Why we created Julia"
 	\end{frame}
 
 
@@ -42,9 +40,10 @@
 			\item{Optimized for speed of calculation}
 		\end{itemize}
 	\end{frame}
-	
-	\begin{frame}{Benchmarks}
+
+	\begin{frame}
 		\includegraphics[width=\textwidth]{figures/benchmarks.jpg}
+		\footnote{Speed relative to C}
 	\end{frame}
 
 	\begin{frame}[fragile]{Some syntax}
@@ -100,27 +99,9 @@
 	\end{frame}
 
 	\begin{frame}{Tasks(2)}
-		Example: Consumer/producer 
-		\includegraphics[width=.6\textwidth]{figures/consume_produce.eps}
+		Example: Integrator \\
+		\includegraphics[width=.6\textwidth]{figures/integrator.eps}
 	\end{frame}	
-
-%	\begin{frame}{Example: Sieve of Erastothenes}
-%		\begin{enumerate}
-%			\item{Start at 2}
-%			\item{If the number is already marked, move to next number}
-%			\item{Else the number is prime, mark all multiples (up to N)}
-%		\end{enumerate}
-%		2 is prime:
-%		\begin{equation*}
-%			2, 3, \textcolor{red}{4}, 5, \textcolor{red}{6}, 7, \textcolor{red}{8}, 9, \textcolor{red}{10}, 11, \textcolor{red}{12}, 13, \textcolor{red}{14}, 15, \textcolor{red}{16}, 17, \textcolor{red}{18}, 19, \textcolor{red}{20}
-%		\end{equation*}
-%		3 is prime:
-%		\begin{equation*}
-%			2, 3, \textcolor{red}{4}, 5, \textcolor{red}{6}, 7, \textcolor{red}{8}, \textcolor{blue}{9}, \textcolor{red}{10}, 11, \textcolor{red}{12}, 13, \textcolor{red}{14}, \textcolor{blue}{15}, \textcolor{red}{16}, 17, \textcolor{red}{18}, 19, \textcolor{red}{20}
-%		\end{equation*}
-%		And so on...
-%
-%	\end{frame}
 
 	\section{Low level parallel Julia}
 
@@ -198,12 +179,12 @@
 
 	\begin{frame}{MapReduce(3)}
 		Example: \\
-		parallel computation of $\pi$
+		A slice of  $\pi$
 		\begin{columns}[c]
 			\column{0.5\textwidth}
 			\includegraphics[height=4cm]{figures/square_circle.jpg}
 			\column{0.5\textwidth}
-			Draw random points, get $\pi$ from ratio of points in the circle.
+			Generate random points from uniform distribution, get $\pi$ from ratio of points in the circle.
 			\begin{equation*}
 				\begin{array}{rcl}		
 					A_{rect} & = & (2r)^2 = 4r^2 \\
@@ -220,9 +201,9 @@
 		\begin{block}{Example with 8 workers:}
 		\begin{semiverbatim}
 		julia> d = DArray(I->rand(length(I[1]),length(I[2])),
-											(80, 80), 
-											[2:9], 
-											[4,2]);	
+											(80, 80),  #dimensions
+											[2:9],     #worker processes
+											[4,2]);	   #distribution
 		
 		julia> remotecall\_fetch(2,localindexes,d)
 		(1:20, 1:40)
@@ -240,9 +221,9 @@
 		\column{.5\textwidth}
 			\begin{equation*}
 			\begin{array}{rcl}
-				c\in\mathbb{C}: & & \\
-				z_0 & = & 0	\\
-				z_{n+1} & = & z_n^2 + c
+				z\in\mathbb{C}: & & \\
+				z_0 & = & z	\\
+				z_{n+1} & = & z_n^2 + z
 			\end{array}
 			\end{equation*}
 			Set of $c$ for which orbit of z around 0 remains bounded. Colours indicate escape time.
