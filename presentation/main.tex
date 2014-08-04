@@ -18,8 +18,11 @@
 
 %% Document
 \begin{document}
+
 	\frame{\titlepage}
+
 	\section{Introduction}
+
 	\begin{frame}{Background(1)}
 		\begin{quote}
 			" We want a language that’s open source, with a liberal license. We want the speed of C with the dynamism of Ruby. We want a language that’s homoiconic, with true macros like Lisp, but with obvious, familiar mathematical notation like Matlab. We want something as usable for general programming as Python, as easy for statistics as R, as natural for string processing as Perl, as powerful for linear algebra as Matlab, as good at gluing programs together as the shell. Something that is dirt simple to learn, yet keeps the most serious hackers happy. We want it interactive and we want it compiled."
@@ -31,9 +34,9 @@
 	\begin{frame}{Background(2)}
 		Julia is: 
 		\begin{itemize}
+			\item{General purpose high-level dynamic programming language}
 			\item{Free \& Open source (MIT licensed)}
 			\item{Development started in 2009, v0.1 in 2012}
-			\item{General purpose high-level dynamic programming language}
 			\item{Designed for parallelism \& distributed computation}
 			\item{Core written in C/C++, STL in Julia}
 			\item{JIT Compiled}
@@ -41,7 +44,7 @@
 		\end{itemize}
 	\end{frame}
 
-	\begin{frame}
+	\begin{frame}{Benchmarks}
 		\includegraphics[width=\textwidth]{figures/benchmarks.jpg}
 		\footnote{Speed relative to C}
 	\end{frame}
@@ -115,10 +118,11 @@
 	\end{frame}
 	
 	\begin{frame}[fragile]{Worker processes}
-		Syntax:
+		\begin{block}{Syntax:}
 		\begin{semiverbatim}
 			julia -p N [filename]
 		\end{semiverbatim}
+		\end{block}
 		\begin{itemize}
 			\item{Launches \verb+N+ worker processes}
 			\item{Runs \verb+filename+ or interactive session}
@@ -147,10 +151,13 @@
 	\end{frame}
 
 	\section{MapReduce}
-	\begin{frame}[fragile]{MapReduce(1)}
+
+	\begin{frame}[fragile]{Parallel map}
+		\begin{block}{Parallel map:}
 		\begin{semiverbatim}
 			pmap(function, collection)
 		\end{semiverbatim}
+		\end{block}
 		Performs \verb+function+ on \verb+collection+. Uses a 'feeder' task for each worker process to serve data, while waiting for result the task yields to next feeder task until work is complete. 
 		\begin{block}{Example: list of expressions}
 			\begin{semiverbatim}
@@ -160,10 +167,14 @@
 		\end{block}
 	\end{frame}
 
-	\begin{frame}[fragile]{MapReduce(2)}
+	\begin{frame}[fragile]{MapReduce}
 		\begin{columns}
 		\column{.7\textwidth}
-		\verb+@parallel+ : Macro for MapReduce
+		\begin{block}{MapReduce macro:}
+			\begin{semiverbatim}
+				@parallel (reduction) for collection
+			\end{semiverbatim}
+		\end{block}
 		\begin{block}{Example: coin toss}	
 		\begin{semiverbatim}
 		heads = 
@@ -177,7 +188,7 @@
 		\end{columns}
 	\end{frame}
 
-	\begin{frame}{MapReduce(3)}
+	\begin{frame}{Example}
 		Example: \\
 		A slice of  $\pi$
 		\begin{columns}[c]
@@ -197,7 +208,9 @@
 
 	\section{Distributed arrays}
 	\begin{frame}[fragile]{Syntax}
-    Constructor: \verb+DArray(init, dims[, procs, dist])+
+    \begin{block}{Constructor:}
+		\verb+DArray(init, dims[, procs, dist])+
+		\end{block}
 		\begin{block}{Example with 8 workers:}
 		\begin{semiverbatim}
 		julia> d = DArray(I->rand(length(I[1]),length(I[2])),
@@ -207,7 +220,6 @@
 		
 		julia> remotecall\_fetch(2,localindexes,d)
 		(1:20, 1:40)
-		
 		julia> remotecall\_fetch(7,localindexes,d)
 		(21:40, 41:80)
 		\end{semiverbatim}
