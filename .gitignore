@@ -7,4 +7,5 @@
 *.vrb
 *.swp
 *.out
+*.txt
 Makefile
